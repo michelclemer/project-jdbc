@@ -98,13 +98,13 @@ public class SellerDaoJDBC implements SellerDao{
 	@Override
 	public void deleteById(Integer id) {
 		PreparedStatement statement = null;
-		ResultSet rs = null;
 		try {
 			statement = conn.prepareStatement("DELETE FROM seller \r\n"
 					+ "WHERE Id = ?", 
 					statement.RETURN_GENERATED_KEYS);
 			statement.setInt(1, id);
-		
+			statement.executeUpdate();
+			
 			
 			
 		} catch (SQLException e) {
