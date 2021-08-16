@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
 
+
 import db.DB;
 import db.DbException;
 import model.dao.SellerDao;
@@ -53,16 +54,10 @@ public class SellerDaoJDBC implements SellerDao{
 			statement.setInt(1, id);
 			rs = statement.executeQuery();
 			if (rs.next()) {
-				Department department  = new Department();
-				department.setId(rs.getInt("DepartmentId"));
-				department.setName(rs.getString("DepName"));
-				Seller objSeller = new Seller();
-				objSeller.setId(rs.getInt("Id"));
-				objSeller.setName(rs.getString("Name"));
-				objSeller.setEmail(rs.getString("Email"));
-				objSeller.setBaseSalary(rs.getDouble("BaseSalary"));
-				objSeller.setBirthDate(rs.getDate("BirthDate"));
-				objSeller.setDepartment(department);
+				Department department = instantiateDepartment(rs);
+				
+				Seller objSeller = instatiateSeller(rs, department);
+				
 				return objSeller;
 			}
 			return null;
@@ -76,6 +71,24 @@ public class SellerDaoJDBC implements SellerDao{
 			DB.closeResultSet(rs);
 		}
 	
+	}
+
+	private Seller instatiateSeller(ResultSet rs, Department department) throws SQLException {
+		Seller objSeller = new Seller();
+		objSeller.setId(rs.getInt("Id"));
+		objSeller.setName(rs.getString("Name"));
+		objSeller.setEmail(rs.getString("Email"));
+		objSeller.setBaseSalary(rs.getDouble("BaseSalary"));
+		objSeller.setBirthDate(rs.getDate("BirthDate"));
+		objSeller.setDepartment(department);
+		return objSeller;
+	}
+
+	private Department instantiateDepartment(ResultSet rs) throws SQLException {
+		Department department = new  Department();
+		department.setId(rs.getInt("DepartmentId"));
+		department.setName(rs.getString("DepName"));
+		return department;
 	}
 
 	@Override
