@@ -1,6 +1,7 @@
 package model.dao.Impl;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,6 +21,7 @@ import model.entities.Department;
 import model.entities.Seller;
 
 
+
 public class SellerDaoJDBC implements SellerDao{
 	private Connection conn;
 	
@@ -29,7 +31,39 @@ public class SellerDaoJDBC implements SellerDao{
 
 	@Override
 	public void insert(Seller obj) {
-		// TODO Auto-generated method stub
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		try {
+			statement = conn.prepareStatement("INSERT INTO seller "
+					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+					+ "VALUES "
+					+ "(?, ?, ?, ?, ?)", 
+					statement.RETURN_GENERATED_KEYS);
+			statement.setString(1, obj.getName());
+			statement.setString(2, obj.getEmail());
+			statement.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
+			statement.setDouble(4, obj.getBaseSalary());
+			statement.setInt(5, obj.getDepartment().getId());
+			int rows = statement.executeUpdate();
+			if(rows > 0) {
+				ResultSet rSet= statement.getGeneratedKeys();
+				if(rSet.next()) {
+					int id  = rSet.getInt(1);
+					obj.setId(id);
+				}
+				DB.closeResultSet(rSet);
+			}
+			else {
+				throw new DbException("Nenhuma linha foi afetada");
+			}
+			
+		} catch (SQLException e) {
+			// TODO: handle exception
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(statement);
+		}
 		
 	}
 
